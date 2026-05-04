@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Admins {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  login      String    @unique(map: "admins_login_unique") @db.VarChar(50)
+  pass       String    @db.VarChar(256)
+  nom        String    @db.VarChar(100)
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @updatedAt @db.Timestamp(0)
+
+  @@map("admins")
+}
+
+model Etudiants {
+  id         Int       @id @default(autoincrement()) @db.UnsignedInt
+  login      String    @db.VarChar(20)
+  pass       String    @db.VarChar(256)
+  nom        String    @db.VarChar(20)
+  filiere    String    @default("RSI") @db.VarChar(20)
+  note1      Int
+  note2      Int
+  quiz1      Int?
+  quiz2      Int?
+  moyenne    Float
+  longitude  Float
+  latitude   Float
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @updatedAt @db.Timestamp(0)
+
+  @@map("etudiants")
+}
+
+model Images {
+  id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name       String    @db.VarChar(20)
+  type       String    @db.VarChar(50)
+  size       Int
+  created_at DateTime? @db.Timestamp(0)
+  updated_at DateTime? @updatedAt @db.Timestamp(0)
+  bin_img    Bytes?
+
+  @@map("images")
+}
+
+model cache {
+  key        String @id
+  value      String @db.MediumText
+  expiration Int
+
+  @@index([expiration], map: "cache_expiration_index")
+}
+
+model cache_locks {
+  key        String @id
+  owner      String
+  expiration Int
+
+  @@index([expiration], map: "cache_locks_expiration_index")
+}
+
+model failed_jobs {
+  id         BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
+  uuid       String   @unique(map: "failed_jobs_uuid_unique")
+  connection String   @db.Text
+  queue      String   @db.Text
+  payload    String   @db.LongText
+  exception  String   @db.LongText
+  failed_at  DateTime @default(now()) @db.Timestamp(0)
+}
+
+model job_batches {
+  id             String  @id
+  name           String
+  total_jobs     Int
+  pending_jobs   Int
+  failed_jobs    Int
+  failed_job_ids String  @db.LongText
+  options        String? @db.MediumText
+  cancelled_at   Int?
+  created_at     Int
+  finished_at    Int?
+}
+
+model jobs {
+  id           BigInt @id @default(autoincrement()) @db.UnsignedBigInt
+  queue        String
+  payload      String @db.LongText
+  attempts     Int    @db.UnsignedTinyInt
+  reserved_at  Int?   @db.UnsignedInt
+  available_at Int    @db.UnsignedInt
+  created_at   Int    @db.UnsignedInt
+
+  @@index([queue], map: "jobs_queue_index")
+}
+
+model migrations {
+  id        Int    @id @default(autoincrement()) @db.UnsignedInt
+  migration String
+  batch     Int
+}
+
+model password_reset_tokens {
+  email      String    @id
+  token      String
+  created_at DateTime? @db.Timestamp(0)
+}
+
+model sessions {
+  id            String  @id
+  user_id       BigInt? @db.UnsignedBigInt
+  ip_address    String? @db.VarChar(45)
+  user_agent    String? @db.Text
+  payload       String  @db.LongText
+  last_activity Int
+
+  @@index([last_activity], map: "sessions_last_activity_index")
+  @@index([user_id], map: "sessions_user_id_index")
+}
+
+model users {
+  id                BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  name              String
+  email             String    @unique(map: "users_email_unique")
+  email_verified_at DateTime? @db.Timestamp(0)
+  password          String
+  remember_token    String?   @db.VarChar(100)
+  created_at        DateTime? @db.Timestamp(0)
+  updated_at        DateTime? @db.Timestamp(0)
+}
